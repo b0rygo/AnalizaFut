@@ -17,10 +17,22 @@ st.set_page_config(page_title="AnalizaFUT", layout="wide")
 
 @st.cache_resource
 def _load():
+    pkl = ROOT / "models" / "predictor.pkl"
+    if not pkl.exists():
+        with st.spinner("Trening modelu (jednorazowo, ~30 s)..."):
+            from model import main as train_main
+            train_main()
+
+    sim_csv = ROOT / "reports" / "simulation_results.csv"
+    if not sim_csv.exists():
+        with st.spinner("Symulacja Monte Carlo (~10 s)..."):
+            from simulate_wc import main as sim_main
+            sim_main()
+
     d = load_data()
     played, fixtures, state = build_features(d["played"], d["fixtures"])
-    model = joblib.load(ROOT / "models" / "predictor.pkl")
-    sim = pd.read_csv(ROOT / "reports" / "simulation_results.csv")
+    model = joblib.load(pkl)
+    sim = pd.read_csv(sim_csv)
     matches = pd.read_csv(ROOT / "reports" / "match_predictions.csv")
     groups = pd.read_csv(ROOT / "reports" / "groups.csv")
     return played, state, model, sim, matches, groups

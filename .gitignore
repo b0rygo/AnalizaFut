@@ -13,4 +13,4 @@ venv/
 .DS_Store
 
 models/*.pkl
-.streamlit/
+.streamlit/secrets.toml
